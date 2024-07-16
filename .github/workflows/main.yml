@@ -1,4 +1,4 @@
-name: Run Discord Bot
+name: Keep Discord Bot Running
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: '0 */6 * * *' # Esto se ejecuta cada 6 horas
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,4 +34,5 @@ jobs:
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-        run: node bot.js
+        run: |
+          nohup node bot.js & disown
