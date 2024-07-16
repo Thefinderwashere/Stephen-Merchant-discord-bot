@@ -35,4 +35,4 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
         run: |
-          nohup node bot.js & disown
+          node bot.js > output.log 2>&1 &
