@@ -25,7 +25,9 @@ client.on('messageCreate', async (message) => {
       return message.reply('Only roles with admin or manage server can use this');
     }
     defaultChannelId = message.channel.id;
-    return message.reply('This is now the default channel');
+    message.reply('This is now the default channel');
+    // Iniciar el envío de imágenes cada 5 minutos después de configurar el canal predeterminado
+    sendRandomImagePeriodically();
   }
 
   if (message.content.toLowerCase().includes('<@1262548989954232403>')) {
