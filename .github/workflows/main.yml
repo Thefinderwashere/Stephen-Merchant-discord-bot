@@ -30,9 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run bot
+      - name: Run bot in loop
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
         run: |
-          node bot.js > output.log 2>&1 &
+          while true; do
+            node bot.js
+            echo "Bot crashed with exit code $?. Restarting..." >&2
+            sleep 1
+          done
