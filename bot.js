@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -11,15 +11,23 @@ const client = new Client({
 });
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const CHANNEL_ID = process.env.CHANNEL_ID;
+let defaultChannelId = null;
 
 client.once('ready', () => {
   console.log('El bot está listo y en línea.');
-  // Llamar a la función para enviar imagen cada 5 minutos
-  sendRandomImagePeriodically();
+  // No se enviará imagen cada 5 minutos hasta que se configure el canal predeterminado
 });
 
 client.on('messageCreate', async (message) => {
+  if (message.content.toLowerCase().includes('<@1262548989954232403> configure def')) {
+    if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator) && 
+        !message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+      return message.reply('Only roles with admin or manage server can use this');
+    }
+    defaultChannelId = message.channel.id;
+    return message.reply('This is now the default channel');
+  }
+
   if (message.content.toLowerCase().includes('<@1262548989954232403>')) {
     const imageUrl = getRandomImage();
     if (imageUrl) {
@@ -32,9 +40,14 @@ client.on('messageCreate', async (message) => {
 
 // Función para enviar imagen aleatoria cada 5 minutos
 async function sendRandomImagePeriodically() {
-  const channel = await client.channels.fetch(CHANNEL_ID);
+  if (!defaultChannelId) {
+    console.log('Canal predeterminado no configurado, no se enviarán imágenes periódicas.');
+    return;
+  }
+
+  const channel = await client.channels.fetch(defaultChannelId);
   if (!channel) {
-    console.error(`No se pudo encontrar el canal con ID ${CHANNEL_ID}.`);
+    console.error(`No se pudo encontrar el canal con ID ${defaultChannelId}.`);
     return;
   }
 
